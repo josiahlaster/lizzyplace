@@ -7,6 +7,7 @@ import Gallery from './components/Gallery'
 import Amenities from './components/Amenities'
 import Location from './components/Location'
 import Reviews from './components/Reviews'
+import BookingCalendar from './components/BookingCalendar'
 import CTA from './components/CTA'
 import Footer from './components/Footer'
 import Modal from './components/Modal'
@@ -30,6 +31,7 @@ export default function App() {
       <Gallery id="gallery-6bed" label="The Grand" title="6-Bedroom Gallery" subtitle="Explore every corner of our spacious 6BR home with basement suite." galleryKey="g6" />
       <Amenities />
       <Location />
+      <BookingCalendar />
       <Reviews />
       <CTA />
       <Footer />
