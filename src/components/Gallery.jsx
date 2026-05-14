@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useReveal } from '../hooks/useReveal'
+import { img } from '../utils/imagePath'
 
 const GALLERY_5 = [
   { src: '/images/5bed/image1.png', alt: 'Front exterior', category: 'exterior', caption: 'Front Exterior & Wraparound Porch' },
@@ -137,7 +138,7 @@ export default function Gallery({ id, label, title, subtitle, galleryKey }) {
             <div className="carousel-slide">
               <img
                 key={items[safeIndex].src}
-                src={items[safeIndex].src}
+                src={img(items[safeIndex].src)}
                 alt={items[safeIndex].alt}
                 className="carousel-img"
               />
@@ -158,7 +159,7 @@ export default function Gallery({ id, label, title, subtitle, galleryKey }) {
                 onClick={() => goTo(i)}
                 aria-label={item.caption}
               >
-                <img src={item.src} alt={item.alt} />
+                <img src={img(item.src)} alt={item.alt} />
               </button>
             ))}
           </div>

@@ -1,8 +1,10 @@
+import { img } from '../utils/imagePath'
+
 export default function Hero() {
   return (
     <section className="hero" id="hero">
       <div className="hero-bg">
-        <img src="/images/5bed/image1.png" alt="Lizzy's Place exterior" />
+        <img src={img('images/5bed/image1.png')} alt="Lizzy's Place exterior" />
       </div>
       <div className="hero-overlay" />
       <div className="hero-content">
