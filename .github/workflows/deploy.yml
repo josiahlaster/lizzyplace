@@ -3,10 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main   # runs on every push to main
+      - main
 
 permissions:
-  contents: write  # needed to push to gh-pages branch
+  contents: write
 
 jobs:
   deploy:
@@ -21,16 +21,13 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-          cache-dependency-path: lizzyplace-react/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        working-directory: lizzyplace-react
         run: npm ci
 
       - name: Build
-        working-directory: lizzyplace-react
         env:
-          # Pulled from: GitHub repo → Settings → Secrets and variables → Actions
           VITE_FORM_EMAIL: ${{ secrets.VITE_FORM_EMAIL }}
         run: npm run build
 
@@ -38,4 +35,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: lizzyplace-react/dist
+          publish_dir: dist
