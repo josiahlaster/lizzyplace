@@ -39,7 +39,7 @@ export default function Properties({ openModal }) {
             <span className="highlight-tag">🅿️ Free Parking</span>
           </div>
           <div className="property-cta">
-            <a href="https://www.airbnb.com/rooms/1191526833797890858" target="_blank" rel="noreferrer" className="btn-book">Book Now</a>
+            <button className="btn-book" onClick={() => document.getElementById('inquiry')?.scrollIntoView({ behavior: 'smooth' })}>Make an Inquiry</button>
             <button className="btn-details" onClick={() => openModal('modal-5br')}>View Rooms</button>
             <a href="#gallery-5bed" className="btn-details" onClick={e => { e.preventDefault(); document.getElementById('gallery-5bed')?.scrollIntoView({ behavior: 'smooth' }) }}>Gallery</a>
           </div>
@@ -69,7 +69,7 @@ export default function Properties({ openModal }) {
             <span className="highlight-tag">👨‍🍳 2 Kitchens</span>
           </div>
           <div className="property-cta">
-            <a href="https://www.airbnb.com/rooms/1414760083961093369" target="_blank" rel="noreferrer" className="btn-book">Book Now</a>
+            <button className="btn-book" onClick={() => document.getElementById('inquiry')?.scrollIntoView({ behavior: 'smooth' })}>Make an Inquiry</button>
             <button className="btn-details" onClick={() => openModal('modal-6br')}>View Rooms</button>
             <a href="#gallery-6bed" className="btn-details" onClick={e => { e.preventDefault(); document.getElementById('gallery-6bed')?.scrollIntoView({ behavior: 'smooth' }) }}>Gallery</a>
           </div>

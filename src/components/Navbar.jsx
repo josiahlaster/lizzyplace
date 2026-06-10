@@ -23,8 +23,9 @@ export default function Navbar() {
         <li><a href="#amenities" onClick={e => { e.preventDefault(); scrollTo('amenities') }}>Amenities</a></li>
         <li><a href="#location" onClick={e => { e.preventDefault(); scrollTo('location') }}>Location</a></li>
         <li><a href="#reviews" onClick={e => { e.preventDefault(); scrollTo('reviews') }}>Reviews</a></li>
+        <li><a href="#inquiry" onClick={e => { e.preventDefault(); scrollTo('inquiry') }}>Contact</a></li>
       </ul>
-      <button className="nav-book" onClick={() => scrollTo('cta')}>Book Now</button>
+      <button className="nav-book" onClick={() => scrollTo('inquiry')}>Make an Inquiry</button>
       <button className="nav-toggle" id="navToggle" aria-label="Menu" onClick={() => setOpen(o => !o)}>
         <span /><span /><span />
       </button>

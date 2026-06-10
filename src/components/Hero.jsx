@@ -13,7 +13,7 @@ export default function Hero() {
         <p>Two thoughtfully designed homes near Duke University — where serene comfort meets Southern hospitality.</p>
         <div className="hero-actions">
           <a href="#properties" className="btn-primary" onClick={e => { e.preventDefault(); document.getElementById('properties')?.scrollIntoView({ behavior: 'smooth' }) }}>Explore Our Homes</a>
-          <a href="#cta" className="btn-secondary" onClick={e => { e.preventDefault(); document.getElementById('cta')?.scrollIntoView({ behavior: 'smooth' }) }}>Book Your Stay</a>
+          <a href="#inquiry" className="btn-secondary" onClick={e => { e.preventDefault(); document.getElementById('inquiry')?.scrollIntoView({ behavior: 'smooth' }) }}>Make an Inquiry</a>
         </div>
       </div>
       <div className="scroll-indicator"><span>Scroll</span><div className="scroll-line" /></div>

@@ -9,6 +9,7 @@ import Location from './components/Location'
 import Reviews from './components/Reviews'
 import BookingCalendar from './components/BookingCalendar'
 import CTA from './components/CTA'
+import InquiryForm from './components/InquiryForm'
 import Footer from './components/Footer'
 import Modal from './components/Modal'
 import './App.css'
@@ -31,8 +32,9 @@ export default function App() {
       <Gallery id="gallery-6bed" label="The Grand" title="6-Bedroom Gallery" subtitle="Explore every corner of our spacious 6BR home with basement suite." galleryKey="g6" />
       <Amenities />
       <Location />
-      <BookingCalendar />
+      {/*<BookingCalendar />*/}
       <Reviews />
+      <InquiryForm />
       <CTA />
       <Footer />
       <Modal id="modal-5br" active={activeModal === 'modal-5br'} onClose={() => setActiveModal(null)} />

@@ -17,10 +17,10 @@ export default function Footer() {
           </ul>
         </div>
         <div>
-          <h4>Book</h4>
+          <h4>Inquire</h4>
           <ul>
-            <li><a href="https://www.airbnb.com/rooms/1191526833797890858" target="_blank" rel="noreferrer">5-Bedroom Home</a></li>
-            <li><a href="https://www.airbnb.com/rooms/1414760083961093369" target="_blank" rel="noreferrer">6-Bedroom Home</a></li>
+            <li><a href="#inquiry" onClick={e => { e.preventDefault(); scrollTo('inquiry') }}>5-Bedroom Home</a></li>
+            <li><a href="#inquiry" onClick={e => { e.preventDefault(); scrollTo('inquiry') }}>6-Bedroom Home</a></li>
           </ul>
         </div>
       </div>
