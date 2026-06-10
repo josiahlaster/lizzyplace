@@ -12,23 +12,34 @@ export default function InquiryForm() {
     const formData = new FormData(e.target)
 
     try {
-      // FormSubmit AJAX endpoint — email is injected at build time from VITE_FORM_EMAIL env var
       const email = import.meta.env.VITE_FORM_EMAIL
+
+      // Guard: catch missing env var before sending
+      if (!email || email === 'undefined') {
+        setStatus('error')
+        setMessage('Form is not configured. Please contact us directly at josiahlaster1@gmail.com')
+        return
+      }
+
+      // FormSubmit AJAX endpoint — email injected at build time from VITE_FORM_EMAIL secret
       const res = await fetch(`https://formsubmit.co/ajax/${email}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(Object.fromEntries(formData)),
       })
       const data = await res.json()
+      console.log('FormSubmit response:', data)
+
       if (data.success === 'true' || data.success === true) {
         setStatus('success')
         setMessage('✓ Thank you! Your inquiry has been sent. Shae & Liz will be in touch soon.')
         e.target.reset()
       } else {
         setStatus('error')
-        setMessage('Something went wrong. Please try again.')
+        setMessage(`Error: ${data.message || 'Something went wrong. Please try again.'}`)
       }
-    } catch {
+    } catch (err) {
+      console.error('Form submission error:', err)
       setStatus('error')
       setMessage('Unable to send. Please check your connection and try again.')
     }
