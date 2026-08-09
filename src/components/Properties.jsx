@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { useReveal } from '../hooks/useReveal'
 import { img } from '../utils/imagePath'
 
@@ -8,6 +9,7 @@ const BathIcon = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor
 
 export default function Properties({ openModal }) {
   const addRef = useReveal()
+  const navigate = useNavigate()
   return (
     <section className="properties" id="properties">
       <div className="properties-header reveal" ref={addRef}>
@@ -39,7 +41,7 @@ export default function Properties({ openModal }) {
             <span className="highlight-tag">🅿️ Free Parking</span>
           </div>
           <div className="property-cta">
-            <button className="btn-book" onClick={() => document.getElementById('inquiry')?.scrollIntoView({ behavior: 'smooth' })}>Make an Inquiry</button>
+            <button className="btn-book" onClick={() => navigate('/book/5br')}>BOOK NOW</button>
             <button className="btn-details" onClick={() => openModal('modal-5br')}>View Rooms</button>
             <a href="#gallery-5bed" className="btn-details" onClick={e => { e.preventDefault(); document.getElementById('gallery-5bed')?.scrollIntoView({ behavior: 'smooth' }) }}>Gallery</a>
           </div>
@@ -69,7 +71,7 @@ export default function Properties({ openModal }) {
             <span className="highlight-tag">👨‍🍳 2 Kitchens</span>
           </div>
           <div className="property-cta">
-            <button className="btn-book" onClick={() => document.getElementById('inquiry')?.scrollIntoView({ behavior: 'smooth' })}>Make an Inquiry</button>
+            <button className="btn-book" onClick={() => navigate('/book/6br')}>BOOK NOW</button>
             <button className="btn-details" onClick={() => openModal('modal-6br')}>View Rooms</button>
             <a href="#gallery-6bed" className="btn-details" onClick={e => { e.preventDefault(); document.getElementById('gallery-6bed')?.scrollIntoView({ behavior: 'smooth' }) }}>Gallery</a>
           </div>
@@ -78,3 +80,4 @@ export default function Properties({ openModal }) {
     </section>
   )
 }
+
