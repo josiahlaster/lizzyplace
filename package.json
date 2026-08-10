@@ -6,7 +6,7 @@
   "homepage": "https://josiahlaster.github.io/lizzyplace",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node copy-404.js",
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
