@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { supabase } from '../utils/supabaseClient';
+import { isSupabaseConfigured, supabase, supabaseKey } from '../utils/supabaseClient';
 import { fetchBlockedDates } from '../utils/availability';
 
 const PROPERTIES = {
@@ -69,14 +69,16 @@ export default function BookingPage() {
         const dates = await fetchBlockedDates(propertyId);
         setBlockedDates(dates);
 
-        const { data, error } = await supabase
-          .from('properties')
-          .select('base_price_per_night')
-          .eq('id', propertyId)
-          .single();
+        if (supabase) {
+          const { data, error } = await supabase
+            .from('properties')
+            .select('base_price_per_night')
+            .eq('id', propertyId)
+            .single();
 
-        if (!error && data) {
-          setPricePerNight(data.base_price_per_night);
+          if (!error && data) {
+            setPricePerNight(data.base_price_per_night);
+          }
         }
       } catch (err) {
         console.error(err);
@@ -210,6 +212,11 @@ export default function BookingPage() {
 
   const handleSubmit = async () => {
     if (!isFormValid || submitting) return;
+    if (!isSupabaseConfigured) {
+      setError('Booking is temporarily unavailable. Please try again later.');
+      return;
+    }
+
     setSubmitting(true);
     setError('');
 
@@ -219,7 +226,7 @@ export default function BookingPage() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          'Authorization': `Bearer ${supabaseKey}`
         },
         body: JSON.stringify({
           propertyId,

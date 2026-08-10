@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../utils/supabaseClient'
+import { isSupabaseConfigured, supabase, supabaseKey } from '../utils/supabaseClient'
 
 export default function AdminDashboard() {
   const [session, setSession] = useState(null)
@@ -23,6 +23,8 @@ export default function AdminDashboard() {
   const [blockSuccess, setBlockSuccess] = useState('')
 
   useEffect(() => {
+    if (!supabase) return undefined
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
     })
@@ -43,6 +45,10 @@ export default function AdminDashboard() {
 
   const handleLogin = async (e) => {
     e.preventDefault()
+    if (!supabase) {
+      setAuthError('Supabase is not configured for this deployment.')
+      return
+    }
     setLoading(true)
     setAuthError('')
     const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -51,6 +57,7 @@ export default function AdminDashboard() {
   }
 
   const handleLogout = async () => {
+    if (!supabase) return
     await supabase.auth.signOut()
     setSession(null)
   }
@@ -82,7 +89,7 @@ export default function AdminDashboard() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          'Authorization': `Bearer ${supabaseKey}`
         }
       })
       const result = await res.json()
@@ -150,6 +157,17 @@ export default function AdminDashboard() {
       .eq('id', id)
     if (error) console.error(error)
     else fetchManualBlocks()
+  }
+
+  if (!isSupabaseConfigured) {
+    return (
+      <div className="admin-login-container">
+        <div className="admin-login-form">
+          <h2 className="admin-title">Host Dashboard Unavailable</h2>
+          <div className="admin-error">Supabase environment variables are missing. Configure VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY before deploying.</div>
+        </div>
+      </div>
+    )
   }
 
   if (!session) {

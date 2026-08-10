@@ -3,6 +3,8 @@ import { supabase } from './supabaseClient'
 export async function fetchBlockedDates(propertyId) {
   const blockedSet = new Set()
 
+  if (!supabase) return blockedSet
+
   try {
     // 1. Fetch blocked dates from iCal sync and manual blocks
     const { data: otaBlocks, error: otaError } = await supabase

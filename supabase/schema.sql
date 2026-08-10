@@ -47,6 +47,14 @@ ALTER TABLE public.properties ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.blocked_dates ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies so this script can be safely rerun after a partial setup.
+DROP POLICY IF EXISTS "Allow public read access to properties" ON public.properties;
+DROP POLICY IF EXISTS "Allow public read access to confirmed bookings" ON public.bookings;
+DROP POLICY IF EXISTS "Allow public read access to blocked dates" ON public.blocked_dates;
+DROP POLICY IF EXISTS "Allow admin full access to properties" ON public.properties;
+DROP POLICY IF EXISTS "Allow admin full access to bookings" ON public.bookings;
+DROP POLICY IF EXISTS "Allow admin full access to blocked_dates" ON public.blocked_dates;
+
 -- Setup public read policies
 CREATE POLICY "Allow public read access to properties" ON public.properties
     FOR SELECT USING (true);
