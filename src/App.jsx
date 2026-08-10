@@ -15,6 +15,7 @@ import Modal from './components/Modal'
 import BookingPage from './components/BookingPage'
 import BookingSuccess from './components/BookingSuccess'
 import BookingCancel from './components/BookingCancel'
+import AdminDashboard from './components/AdminDashboard'
 import './App.css'
 
 function ScrollToTop() {
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="/book/:propertyId" element={<BookingPage />} />
         <Route path="/booking/success" element={<BookingSuccess />} />
         <Route path="/booking/cancel" element={<BookingCancel />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
       <Footer />
     </BrowserRouter>

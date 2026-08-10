@@ -1,73 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useReveal } from '../hooks/useReveal'
-
-// iCal URLs – Airbnb provides these in your listing's Calendar settings
-const ICAL_URLS = {
-  '5br': {
-    airbnb: 'https://www.airbnb.com/calendar/ical/1191526833797890858.ics',
-    vrbo: '', // Paste your VRBO iCal export URL here from VRBO Host > Calendar > Export
-  },
-  '6br': {
-    airbnb: 'https://www.airbnb.com/calendar/ical/1414760083961093369.ics',
-    vrbo: '', // Paste your VRBO iCal export URL here from VRBO Host > Calendar > Export
-  },
-}
-
-// CORS proxy needed because browsers block direct iCal fetches
-const PROXY = 'https://corsproxy.io/?url='
-
-// Parse iCal text → Set of 'YYYY-MM-DD' blocked date strings
-function parseICal(text) {
-  const blocked = new Set()
-  const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
-    .replace(/\n[ \t]/g, '') // unfold
-    .split('\n')
-
-  let inEvent = false
-  let dtStart = null
-  let dtEnd = null
-
-  for (const line of lines) {
-    if (line === 'BEGIN:VEVENT') { inEvent = true; dtStart = null; dtEnd = null }
-    if (line === 'END:VEVENT') {
-      if (dtStart && dtEnd) {
-        const cur = new Date(dtStart)
-        while (cur < dtEnd) {
-          blocked.add(cur.toISOString().slice(0, 10))
-          cur.setDate(cur.getDate() + 1)
-        }
-      }
-      inEvent = false
-    }
-    if (!inEvent) continue
-    const [key, ...rest] = line.split(':')
-    const val = rest.join(':').trim()
-    const baseKey = key.split(';')[0]
-    if (baseKey === 'DTSTART') dtStart = parseICalDate(val)
-    if (baseKey === 'DTEND') dtEnd = parseICalDate(val)
-  }
-  return blocked
-}
-
-function parseICalDate(val) {
-  // DATE-TIME: 20250601T140000Z or DATE: 20250601
-  const clean = val.replace('Z', '')
-  const y = clean.slice(0, 4), m = clean.slice(4, 6), d = clean.slice(6, 8)
-  return new Date(`${y}-${m}-${d}`)
-}
-
-// Fetch an iCal URL via CORS proxy
-async function fetchICal(url) {
-  if (!url) return new Set()
-  try {
-    const res = await fetch(`${PROXY}${encodeURIComponent(url)}`)
-    if (!res.ok) return new Set()
-    const json = await res.json()
-    return parseICal(json.contents)
-  } catch {
-    return new Set()
-  }
-}
+import { fetchBlockedDates } from '../utils/availability'
 
 function daysInMonth(year, month) { return new Date(year, month + 1, 0).getDate() }
 function firstDayOfMonth(year, month) { return new Date(year, month, 1).getDay() }
@@ -117,9 +50,9 @@ function PropertyCalendar({ propertyKey, airbnbUrl, label }) {
   ]
 
   useEffect(() => {
-    const urls = ICAL_URLS[propertyKey]
-    Promise.all([fetchICal(urls.airbnb), fetchICal(urls.vrbo)]).then(([a, v]) => {
-      setBlocked(new Set([...a, ...v]))
+    setLoading(true)
+    fetchBlockedDates(propertyKey).then(dates => {
+      setBlocked(dates)
       setLoading(false)
     })
   }, [propertyKey])

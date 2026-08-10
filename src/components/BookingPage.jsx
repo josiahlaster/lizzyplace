@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-
-const API = import.meta.env.VITE_API_URL || '';
+import { supabase } from '../utils/supabaseClient';
+import { fetchBlockedDates } from '../utils/availability';
 
 const PROPERTIES = {
   '5br': {
@@ -50,7 +50,7 @@ export default function BookingPage() {
 
   const [baseMonth, setBaseMonth] = useState({ year: today.getFullYear(), month: today.getMonth() });
   const [blockedDates, setBlockedDates] = useState(new Set());
-  const [pricePerNight, setPricePerNight] = useState(500);
+  const [pricePerNight, setPricePerNight] = useState(299);
   const [loading, setLoading] = useState(true);
   const [checkIn, setCheckIn] = useState(null);   // 'YYYY-MM-DD' string
   const [checkOut, setCheckOut] = useState(null);  // 'YYYY-MM-DD' string
@@ -63,15 +63,28 @@ export default function BookingPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setLoading(true);
-    fetch(`${API}/api/availability/${propertyId}`)
-      .then(r => r.json())
-      .then(data => {
-        if (data.blockedDates) setBlockedDates(new Set(data.blockedDates));
-        if (data.pricePerNight) setPricePerNight(data.pricePerNight);
+    async function loadData() {
+      setLoading(true);
+      try {
+        const dates = await fetchBlockedDates(propertyId);
+        setBlockedDates(dates);
+
+        const { data, error } = await supabase
+          .from('properties')
+          .select('base_price_per_night')
+          .eq('id', propertyId)
+          .single();
+
+        if (!error && data) {
+          setPricePerNight(data.base_price_per_night);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    }
+    loadData();
   }, [propertyId]);
 
   const isBlocked = (dateStr) => blockedDates.has(dateStr);
@@ -201,17 +214,21 @@ export default function BookingPage() {
     setError('');
 
     try {
-      const res = await fetch(`${API}/api/create-checkout-session`, {
+      const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`;
+      const res = await fetch(functionUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+        },
         body: JSON.stringify({
           propertyId,
-          checkIn,
-          checkOut,
+          startDate: checkIn,
+          endDate: checkOut,
           guestName: guestName.trim(),
           guestEmail: guestEmail.trim(),
           guestPhone: guestPhone.trim(),
-          numGuests,
+          totalAmount: total,
         }),
       });
       const data = await res.json();
