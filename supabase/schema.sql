@@ -27,9 +27,17 @@ CREATE TABLE IF NOT EXISTS public.bookings (
     stripe_session_id TEXT UNIQUE,
     status TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'confirmed', 'cancelled'
     total_price NUMERIC NOT NULL,
+    expires_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     CONSTRAINT bookings_dates_check CHECK (start_date < end_date)
 );
+
+-- Add the hold-expiration column when upgrading an existing database.
+ALTER TABLE public.bookings
+    ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP WITH TIME ZONE;
+
+CREATE INDEX IF NOT EXISTS bookings_active_dates_idx
+    ON public.bookings (property_id, start_date, end_date, status, expires_at);
 
 -- 3. Blocked Dates (from iCal sync imports or manual blocks)
 CREATE TABLE IF NOT EXISTS public.blocked_dates (

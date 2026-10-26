@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+const supabasePublicKey = Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? Deno.env.get('SUPABASE_ANON_KEY') ?? ''
 
 function formatDate(dateStr: string) {
   // input: '2026-08-10' -> output: '20260810'
@@ -18,7 +18,7 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(supabaseUrl, supabaseAnonKey)
+    const supabase = createClient(supabaseUrl, supabasePublicKey)
 
     // Query confirmed direct bookings
     const { data: bookings, error } = await supabase

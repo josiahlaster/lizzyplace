@@ -13,9 +13,10 @@ serve(async (req) => {
   }
 
   try {
+    // This function creates and updates bookings, so it must use a server-only key.
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SECRET_KEY') ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
@@ -24,8 +25,42 @@ serve(async (req) => {
     })
 
     const { propertyId, startDate, endDate, guestName, guestEmail, guestPhone, totalAmount } = await req.json()
+    const now = new Date()
+    const nowIso = now.toISOString()
+    const holdExpiresAt = new Date(now.getTime() + 30 * 60 * 1000).toISOString()
 
-    // 1. Create a pending booking in the database
+    // Release expired checkout holds before checking for conflicts.
+    await supabaseClient
+      .from('bookings')
+      .update({ status: 'cancelled' })
+      .eq('status', 'pending')
+      .lt('expires_at', nowIso)
+
+    // Prevent overlapping confirmed bookings and active checkout holds.
+    const { data: overlappingBookings, error: conflictError } = await supabaseClient
+      .from('bookings')
+      .select('id, status, expires_at')
+      .eq('property_id', propertyId)
+      .in('status', ['pending', 'confirmed'])
+      .lt('start_date', endDate)
+      .gt('end_date', startDate)
+
+    if (conflictError) throw conflictError
+
+    const hasConflict = overlappingBookings?.some((existingBooking) => (
+      existingBooking.status === 'confirmed' ||
+      !existingBooking.expires_at ||
+      new Date(existingBooking.expires_at) > now
+    ))
+
+    if (hasConflict) {
+      return new Response(JSON.stringify({ error: 'Dates are not available' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 409,
+      })
+    }
+
+    // 1. Create a 30-minute pending booking hold in the database
     const { data: booking, error: dbError } = await supabaseClient
       .from('bookings')
       .insert({
@@ -36,7 +71,8 @@ serve(async (req) => {
         guest_email: guestEmail,
         guest_phone: guestPhone,
         total_price: totalAmount,
-        status: 'pending'
+        status: 'pending',
+        expires_at: holdExpiresAt
       })
       .select()
       .single()
@@ -69,10 +105,12 @@ serve(async (req) => {
     })
 
     // 3. Update the pending booking with the Stripe Session ID
-    await supabaseClient
+    const { error: sessionUpdateError } = await supabaseClient
       .from('bookings')
       .update({ stripe_session_id: session.id })
       .eq('id', booking.id)
+
+    if (sessionUpdateError) throw sessionUpdateError
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

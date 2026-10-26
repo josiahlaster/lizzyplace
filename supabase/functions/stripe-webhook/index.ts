@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import Stripe from "https://esm.sh/stripe@11.1.0?target=deno"
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '' // Service role to bypass RLS for updates
+const supabaseServiceKey = Deno.env.get('SUPABASE_SECRET_KEY') ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '' // Server-only key to bypass RLS for updates
 
 serve(async (req) => {
   const signature = req.headers.get('stripe-signature')
@@ -37,7 +37,7 @@ serve(async (req) => {
         // 1. Mark booking as confirmed
         const { data: booking, error: updateError } = await supabase
           .from('bookings')
-          .update({ status: 'confirmed' })
+          .update({ status: 'confirmed', expires_at: null })
           .eq('id', bookingId)
           .select()
           .single()
