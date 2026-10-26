@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import validateEmail from '../utils/validateEmail'
 
 export default function InquiryForm() {
   const [status, setStatus] = useState('idle') // idle | loading | success | error
@@ -10,6 +11,15 @@ export default function InquiryForm() {
     setMessage('')
 
     const formData = new FormData(e.target)
+
+    // Validates like the mail API does — the browser allows "name.@gmail.com"
+    const emailValue = (formData.get('email') || '').toString()
+    if (!validateEmail(emailValue)) {
+      setStatus('error')
+      setMessage(`“${emailValue.trim()}” is not a valid email address. Please check it and try again (e.g. jane@example.com).`)
+      setTimeout(() => { setStatus('idle'); setMessage('') }, 8000)
+      return
+    }
 
     try {
       const email = import.meta.env.VITE_FORM_EMAIL

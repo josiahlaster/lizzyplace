@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { isSupabaseConfigured, supabase, supabaseKey } from '../utils/supabaseClient';
 import { fetchBlockedDates } from '../utils/availability';
+import validateEmail from '../utils/validateEmail';
 
 const PROPERTIES = {
   '5br': {
@@ -208,7 +209,7 @@ export default function BookingPage() {
     : 0;
   const total = nights * pricePerNight;
 
-  const isFormValid = checkIn && checkOut && guestName.trim() && guestEmail.trim() && guestPhone.trim() && numGuests > 0;
+  const isFormValid = checkIn && checkOut && guestName.trim() && validateEmail(guestEmail) && guestPhone.trim() && numGuests > 0;
 
   const handleSubmit = async () => {
     if (!isFormValid || submitting) return;
